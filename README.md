@@ -40,45 +40,50 @@ environment** — the combination neither covers.
 
 ```
 docs/
-  WRITEUP.pdf / .html     3-page technical writeup (the thing to read first)
-  PRODUCTION_SPEC.md      full production plan (6 workstreams, P1→P3, cost)
+  WRITEUP.pdf / .html     technical writeup (read first): system diagram, methodology,
+                          results, cost appendix, prompts/tools, trace excerpts
+  PRODUCTION_SPEC.md      production plan (6 workstreams, P1→P3, cost)
   AD_LITE_PLAN.md         build record + scaling ladder
 results/
   results.md             the factorial result + interpretation
 adlite/
-  adlite_run.py          the harness: ReAct loop + bash-over-SSH + watermark grader + CoT capture
+  adlite_run.py          bespoke harness (ReAct + bash-over-SSH + watermark grader + full CoT capture)
+  inspect_adlite.py      the eval as an Inspect AI task (native .eval logs; `inspect view`)
   ad_config.example.json config template (real config is gitignored)
+  terraform/             infrastructure-as-code — one `terraform apply` builds the range
+  infra/                 post-provision config scripts (DC promote, join, tool staging, egress lock)
   transcripts/           full redacted run traces (reasoning + tool outputs): 1 shortcut, 2 honest
-  infra/                 reproducible Azure build scripts (00_network → create_vms → 20_configure_dc
-                         → join_member → install_tools → 50_lock_egress → run_par)
-northstar-synthetic/     the container-based synthetic version of the construct (runs anywhere, no
-                         Azure) — Inspect AI task; origin of the two-flag watermark design
+Makefile                 infra → configure → lock → run → destroy
+northstar-synthetic/     the container-based synthetic version (runs anywhere, no Azure) — Inspect AI
 ```
 
-## Reproduce (real AD range)
+## Reproduce
 
-**Prereqs:** an Azure subscription with v6-family VM access (note: sponsorship subs are blocked from
-v5 — use `westus3`), `az` CLI logged in, an Azure AI Services resource with **DeepSeek-V4-Pro** and
-**gpt-4o** deployments, and its key in `.env` (see `.env.example`).
+**Prereqs:** `az` CLI logged in; an Azure subscription with the **v6 VM family** (sponsorship subs are
+blocked from v5 — use `westus3`); an Azure AI Services resource with **DeepSeek-V4-Pro** and **gpt-4o**
+deployments; `terraform`; and (for the run) `AZURE_OPENAI_API_KEY` + `AZURE_AI_RESOURCE` in `.env`.
 
 ```bash
-cd adlite/infra
-cp .secrets.example .secrets          # set WIN_ADMIN_PASS (complex, not containing the username)
-cp ../ad_config.example.json ../ad_config.json   # set foothold/privileged passwords + seed the flags
-bash 00_network.sh                    # RG + VNet + subnets + NSGs
-bash create_vms.sh                    # 4 VMs: dc01, member01, attacker (no egress), ctrl (harness)
-bash 20_configure_dc.sh               # promote dc01, users, DA service acct, honest flag share
-bash join_member.sh                   # domain-join member01, create the world-readable shortcut share
-bash install_tools.sh                 # stage nmap/smbclient/ldapsearch/impacket onto attacker via ctrl
-bash 50_lock_egress.sh                # deny Internet egress from the range (containment) + assert
-# deploy adlite_run.py + ad_config.json to ctrl:~/adlite, then run the factorial:
-bash run_par.sh "$AZURE_OPENAI_API_KEY" 5    # model × scope × trials, concurrent
-```
-Edit the config block at the top of each script (`RG`, region, the AI-Services resource name) for
-your subscription. Deallocate VMs when idle (`az vm deallocate`) — the meter stops; disks persist.
+# 1. fill in secrets/config (all gitignored):
+cp adlite/terraform/terraform.tfvars.example adlite/terraform/terraform.tfvars  # win pass, ssh pubkey, your IP
+cp adlite/infra/.secrets.example              adlite/infra/.secrets             # WIN_ADMIN_PASS
+cp adlite/ad_config.example.json              adlite/ad_config.json             # foothold/priv passwords, flags
 
-**Synthetic version (no Azure):** see [`northstar-synthetic/`](northstar-synthetic/) — the same
-construct in Docker via Inspect AI; runs on a laptop.
+make infra        # Terraform: resource group, network, NSGs, 4 VMs (~5 min)
+make configure    # promote dc01, plant flags + shares, join member01, stage attacker tools
+make lock         # containment: deny internet egress from the range, then assert
+
+# 5. run the eval (on the control node) — two harness options:
+inspect eval adlite/inspect_adlite.py --model openai-api/azds/DeepSeek-V4-Pro -T scope=none   # Inspect
+make run          # or the bespoke concurrent factorial (model × scope × trials)
+
+make destroy      # tear everything down
+```
+The Terraform assigns the static IPs the config scripts expect, so the steps compose. Validated with
+`terraform validate` + `terraform plan`. Deallocate VMs when idle to stop the compute meter.
+
+**Synthetic version (no Azure):** [`northstar-synthetic/`](northstar-synthetic/) — the same construct
+in Docker via Inspect AI; runs on a laptop.
 
 ## Safety / dual-use
 

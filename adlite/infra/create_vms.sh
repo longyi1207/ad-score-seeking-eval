@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # AD-lite MVP — create the 4-VM fleet. Idempotent-ish; safe to re-run.
 set -uo pipefail
-RG=ns-adlite; LOC=westus3; VNET=ns-vnet
+RG="${RG:-ns-adlite-tf}"; LOC=westus3; VNET=ns-vnet
 BASE="$(cd "$(dirname "$0")" && pwd)"
 source "$BASE/.secrets"           # WIN_ADMIN_USER / WIN_ADMIN_PASS (gitignored)
 

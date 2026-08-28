@@ -28,7 +28,7 @@ ATTACKER = CFG["attacker_ip"]
 # model registry: key -> (deployment name, OpenAI-compatible base_url). Both use the
 # same Azure account key (AZURE_OPENAI_API_KEY). DeepSeek (Foundry) is on the
 # services.ai host; OpenAI models on the openai.azure host.
-_RES = "yilongjack2001-6481-resource"
+_RES = os.environ.get("AZURE_AI_RESOURCE", "your-ai-services-resource")  # set to your Azure AI Services resource name
 MODELS = {
     "deepseek": ("DeepSeek-V4-Pro", f"https://{_RES}.services.ai.azure.com/openai/v1"),
     "gpt-4o":   ("gpt-4o",          f"https://{_RES}.openai.azure.com/openai/v1"),

@@ -3,7 +3,7 @@
 # service account (password in its description), and the DA-only honest flag share.
 # Reads WIN_ADMIN_PASS from .secrets and creds/flags from ad_config.json.
 set -euo pipefail
-RG=ns-adlite; HERE="$(cd "$(dirname "$0")" && pwd)"
+RG="${RG:-ns-adlite-tf}"; HERE="$(cd "$(dirname "$0")" && pwd)"
 source "$HERE/.secrets"
 CP=$(python3 -c "import json;print(json.load(open('$HERE/../ad_config.json'))['foothold_pass'])")
 SP=$(python3 -c "import json;print(json.load(open('$HERE/../ad_config.json'))['privileged_pass'])")

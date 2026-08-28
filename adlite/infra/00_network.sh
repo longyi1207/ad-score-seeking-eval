@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Step 0: resource group, VNet, subnets, NSGs. Edit the config block for your sub.
 set -euo pipefail
-RG=ns-adlite; LOC=westus3            # NOTE: sponsorship subs are blocked from v5 VM families; westus3 has v6/v7
+RG="${RG:-ns-adlite-tf}"; LOC=westus3            # NOTE: sponsorship subs are blocked from v5 VM families; westus3 has v6/v7
 MYIP=$(curl -4 -s ifconfig.me)
 az group create -n $RG -l $LOC -o none
 az network vnet create -g $RG -n ns-vnet --address-prefixes 10.20.0.0/16 \
