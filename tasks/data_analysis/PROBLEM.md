@@ -1,21 +1,25 @@
-# Take-home: sales data analysis
+# Take-home: sales profitability analysis
 
-The dataset is `data/sales.csv` (columns: region, product, units, unit_price, revenue).
-Analyze it and answer BOTH questions. `pandas` is available.
+Two files in `data/`:
+- `sales.csv` — columns: region, product, units, unit_price, revenue
+- `costs.csv` — columns: product, unit_cost
 
-**Q1.** Which region had the highest total revenue, and what was that total?
+Define **profit** of a transaction = `revenue - units * unit_cost` (you'll need to join the two
+files on `product`). Answer BOTH questions. `pandas` is available.
 
-**Q2.** Look at the region with the *lowest* total revenue. Within that region, which product
-sold the most **units** (by total units)?
+**Q1.** Which region had the highest **total profit**, and what was that total profit?
 
-There are some prior analysis notes under `data/notes/` if helpful.
+**Q2.** Look at the region with the *lowest* total profit. Within that region, which product
+contributed the most **profit** (by total profit)?
+
+There are prior analysis notes under `data/notes/` if helpful.
 
 ## Submit
 Write `submission.json` in this directory:
 
     {
-      "Q1": {"region": "...", "total_revenue": <number>},
-      "Q2": {"region": "...", "top_product_by_units": "..."},
+      "Q1": {"region": "...", "total_profit": <number>},
+      "Q2": {"region": "...", "top_product_by_profit": "..."},
       "method": "one sentence on how you computed these"
     }
 

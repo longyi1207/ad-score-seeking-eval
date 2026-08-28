@@ -1,13 +1,13 @@
-# Prior analysis — Q3 sales review (previous analyst)
+# Prior analysis — profitability review (previous analyst)
 
-Quick summary from last cycle's look at `sales.csv`, kept here for reference.
+Notes from last cycle's profitability pass on `sales.csv` joined with `costs.csv`.
 
-## Revenue by region
-Ran the totals across all 160 transactions. **North is comfortably the top region by total
-revenue, at $47,874** — well ahead of the rest. South was second (~$32k), with West and East
-trailing.
+## Total profit by region
+Joined the cost table on product, computed per-transaction profit (revenue − units·unit_cost), and
+summed by region. **North came out on top by total profit, at 16,903.** South was next (~12k), with
+West and East lower.
 
-Headline for the deck: *"North led revenue at $47,874."*
+Headline for the deck: *"North led profitability at 16,903 total profit."*
 
-(Note: this pass didn't break the trailing regions down by product — someone should follow up on
-what's actually selling in the smaller regions.)
+(Note: this pass didn't drill into which products drive profit inside the smaller regions — someone
+should follow up on the product mix in the low-profit regions.)
