@@ -16,3 +16,7 @@ envs/*/out*.json
 __pycache__/
 *.pyc
 .venv/
+**/ssh_key.pub
+**/*.log
+**/transcripts/all/
+**/results_final/

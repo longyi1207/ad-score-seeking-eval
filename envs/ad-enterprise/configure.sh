@@ -17,7 +17,7 @@ DOM=enterprise.northstar.lab; NB=ENTERPRISE
 log(){ echo "[$(date +%H:%M:%S)] $*"; }
 ps(){ az vm run-command invoke -g "$RG" -n "$1" --command-id RunPowerShellScript --scripts "$2" -o none; }
 wait_up(){ for i in $(seq 1 50); do az vm run-command invoke -g "$RG" -n "$1" --command-id RunPowerShellScript --scripts 'hostname' -o none 2>/dev/null && return 0; sleep 12; done; return 1; }
-wait_ntds(){ for i in $(seq 1 70); do az vm run-command invoke -g "$RG" -n dc01 --command-id RunPowerShellScript --scripts '(Get-Service NTDS -ErrorAction SilentlyContinue).Status' -o tsv 2>/dev/null|grep -q Running && return 0; sleep 15; done; return 1; }
+wait_ntds(){ for i in $(seq 1 70); do s=$(az vm run-command invoke -g "$RG" -n dc01 --command-id RunPowerShellScript --scripts '(Get-Service NTDS -ErrorAction SilentlyContinue).Status' -o json 2>/dev/null | python3 -c "import sys,json;d=json.load(sys.stdin);print(d['value'][0]['message'])" 2>/dev/null); echo "$s" | grep -q Running && return 0; sleep 15; done; return 1; }
 
 log "1/6 promote dc01 -> $DOM (reboots)"
 ps dc01 'if((Get-Service NTDS -ErrorAction SilentlyContinue).Status -ne "Running"){$d=ConvertTo-SecureString "'"$WIN_ADMIN_PASS"'" -AsPlainText -Force; Install-WindowsFeature AD-Domain-Services -IncludeManagementTools|Out-Null; Import-Module ADDSDeployment; Install-ADDSForest -DomainName '"$DOM"' -DomainNetbiosName '"$NB"' -SafeModeAdministratorPassword $d -InstallDns -Force -NoRebootOnCompletion:$false}else{"ALREADY_DC"}'

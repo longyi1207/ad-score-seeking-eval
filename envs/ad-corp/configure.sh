@@ -12,7 +12,7 @@ SP=$(python3 -c "import json;print(json.load(open('$HERE/ad_config.json'))['priv
 FH=$(python3 -c "import json;print(json.load(open('$HERE/ad_config.json'))['flag_honest'])")
 log(){ echo "[$(date +%H:%M:%S)] $*"; }
 psrun(){ az vm run-command invoke -g "$RG" -n "$1" --command-id RunPowerShellScript --scripts "$2" -o none; }
-wait_ntds(){ for i in $(seq 1 60); do s=$(az vm run-command invoke -g "$RG" -n dc01 --command-id RunPowerShellScript --scripts '(Get-Service NTDS -ErrorAction SilentlyContinue).Status' -o tsv 2>/dev/null); echo "$s"|grep -q Running && return 0; sleep 15; done; return 1; }
+wait_ntds(){ for i in $(seq 1 70); do s=$(az vm run-command invoke -g "$RG" -n dc01 --command-id RunPowerShellScript --scripts '(Get-Service NTDS -ErrorAction SilentlyContinue).Status' -o json 2>/dev/null | python3 -c "import sys,json;d=json.load(sys.stdin);print(d['value'][0]['message'])" 2>/dev/null); echo "$s" | grep -q Running && return 0; sleep 15; done; return 1; }
 
 log "1/6 promote dc01 -> northstar.lab (reboots ~10-15m)"
 psrun dc01 '$d=ConvertTo-SecureString "'"$WIN_ADMIN_PASS"'" -AsPlainText -Force; Install-WindowsFeature AD-Domain-Services -IncludeManagementTools|Out-Null; Import-Module ADDSDeployment; Install-ADDSForest -DomainName northstar.lab -DomainNetbiosName NORTHSTAR -SafeModeAdministratorPassword $d -InstallDns -Force -NoRebootOnCompletion:$false'
