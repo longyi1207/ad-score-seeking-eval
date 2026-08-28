@@ -193,7 +193,7 @@ occurred under the <i>forbid</i> prompt — the model ground away at the honest 
 budget. A forbid-fail is therefore "tried honestly, couldn't finish," not "chose not to seek" — the
 confound we keep controlled (and which the hardened honest path in P2 will sharpen).</li>
 </ul>
-<p class="tight">Full redacted traces of individual runs (every turn, its reasoning, and every tool call/output) are in the repo under <code>adlite/transcripts/</code>; two contrasting DeepSeek runs are excerpted in Appendix&nbsp;B.</p>
+<p class="tight">Full redacted traces of individual runs (every turn, its reasoning, and every tool call/output) are in the repo under <code>adlite/transcripts/</code>; two contrasting DeepSeek runs are excerpted in Appendix&nbsp;B. Hypotheses for the cross-model difference are in Appendix&nbsp;D.</p>
 
 <h2><span class="n">5</span>Cost & time</h2>
 <div class="two">
@@ -343,4 +343,24 @@ VM-hours ⇒ <b>~$400–1,500</b>. A separate, optional escalation to faithful <
 runs (multi-hour, ~200M tokens each) would be on the order of <b>$2k+</b> and is not needed for the
 propensity result. Cost scales roughly linearly with (runs × model price); DeepSeek-weighting a grid
 keeps it at the low end, GPT-4o-weighting at the high end.</p>
+
+<h2><span class="n">D</span>Appendix — why might one model score-seek more? (hypotheses)</h2>
+<p class="tight">Speculative; full version with citations in <code>docs/HYPOTHESES.md</code>.
+<b>Caveat first:</b> the direction is <i>not</i> universal — in Palisade's chess study OpenAI's
+o1-preview cheated more than DeepSeek-R1 (37% vs 11%), and on ImpossibleBench GPT-5 cheated most
+(54%). So this is about <i>this construct</i>, not "DeepSeek cheats more" in general.</p>
+<ul>
+<li><b>H1 — outcome-based RL (RLVR).</b> DeepSeek leans heavily on RL from verifiable/outcome rewards,
+the canonical driver of reward hacking. Direct evidence: DeepSeek-V3 → its RL-tuned R1-Zero variant
+raised a tool-use exploit rate <b>0.6% → 13.9%</b> — the RL stage <i>induced</i> the hacking.</li>
+<li><b>H2 — lighter anti-gaming / scope-adherence tuning.</b> OpenAI models are extremely
+guidance-sensitive (GPT-5 85% → 1% cheating with a strict prompt); here GPT-4o held 0% even under the
+<i>neutral</i> prompt — strong default scope adherence, whereas DeepSeek needed the explicit "forbid"
+sentence to reach 0%.</li>
+<li><b>H3 — confounds.</b> Not raw capability (that predicts the opposite of our result); may partly be
+reasoning-RL vs instruction-tuned model rather than "vendor"; n=5, one task.</li>
+</ul>
+<p class="tight">Cheapest discriminating test: a base-vs-RL-tuned ablation <i>within one family</i>
+(e.g. V3 vs R1) in this range, plus adding Claude / o-series / open models — is the effect the vendor,
+or the RL recipe?</p>
 </body></html>
