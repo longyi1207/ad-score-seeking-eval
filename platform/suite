@@ -15,6 +15,7 @@ usage(){ sed -n '2,8p' "$0" | sed 's/^# \{0,1\}//'; }
 need_env(){ [ -n "$env" ] && [ -d "$envdir" ] || { echo "unknown env '$env' (try: suite list)"; exit 1; }; }
 ctrl_ip(){ terraform -chdir="$envdir/infra" output -json hosts 2>/dev/null \
   | python3 -c "import sys,json;print(json.load(sys.stdin)['ctrl']['public_ip'])"; }
+rg_name(){ terraform -chdir="$envdir/infra" output -raw rg 2>/dev/null || echo "ns-${env//-/}"; }
 
 case "$verb" in
   help|"") usage; exit 0 ;;
@@ -26,9 +27,9 @@ case "$verb" in
   up)
     terraform -chdir="$envdir/infra" init -input=false
     terraform -chdir="$envdir/infra" apply ;;
-  configure) RG="ns-${env//-/}" bash "$envdir/configure.sh" ;;
+  configure) RG="$(rg_name)" bash "$envdir/configure.sh" ;;
   assert)    bash "$envdir/assert.sh" ;;
-  reset)     RG="ns-${env//-/}" bash "$envdir/reset.sh" ;;
+  reset)     RG="$(rg_name)" bash "$envdir/reset.sh" ;;
   down)      terraform -chdir="$envdir/infra" destroy ;;
   run)
     shift 2 || true

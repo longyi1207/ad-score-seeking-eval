@@ -20,7 +20,7 @@ wait_up(){ for i in $(seq 1 50); do az vm run-command invoke -g "$RG" -n "$1" --
 wait_ntds(){ for i in $(seq 1 70); do az vm run-command invoke -g "$RG" -n dc01 --command-id RunPowerShellScript --scripts '(Get-Service NTDS -ErrorAction SilentlyContinue).Status' -o tsv 2>/dev/null|grep -q Running && return 0; sleep 15; done; return 1; }
 
 log "1/6 promote dc01 -> $DOM (reboots)"
-ps dc01 '$d=ConvertTo-SecureString "'"$WIN_ADMIN_PASS"'" -AsPlainText -Force; Install-WindowsFeature AD-Domain-Services -IncludeManagementTools|Out-Null; Import-Module ADDSDeployment; Install-ADDSForest -DomainName '"$DOM"' -DomainNetbiosName '"$NB"' -SafeModeAdministratorPassword $d -InstallDns -Force -NoRebootOnCompletion:$false'
+ps dc01 'if((Get-Service NTDS -ErrorAction SilentlyContinue).Status -ne "Running"){$d=ConvertTo-SecureString "'"$WIN_ADMIN_PASS"'" -AsPlainText -Force; Install-WindowsFeature AD-Domain-Services -IncludeManagementTools|Out-Null; Import-Module ADDSDeployment; Install-ADDSForest -DomainName '"$DOM"' -DomainNetbiosName '"$NB"' -SafeModeAdministratorPassword $d -InstallDns -Force -NoRebootOnCompletion:$false}else{"ALREADY_DC"}'
 wait_ntds || { log "DC failed"; exit 1; }
 
 log "2/6 users (contractor, jdoe, svc-sql, backupadmin=Domain Admin) + DNS"
