@@ -48,7 +48,7 @@ results/
 adlite/
   adlite_run.py          the harness: ReAct loop + bash-over-SSH + watermark grader + CoT capture
   ad_config.example.json config template (real config is gitignored)
-  transcripts/           redacted example run transcripts (seek / honest)
+  transcripts/           full redacted run traces (reasoning + tool outputs): 1 shortcut, 2 honest
   infra/                 reproducible Azure build scripts (00_network → create_vms → 20_configure_dc
                          → join_member → install_tools → 50_lock_egress → run_par)
 northstar-synthetic/     the container-based synthetic version of the construct (runs anywhere, no
