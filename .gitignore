@@ -1,0 +1,8 @@
+**/.secrets
+**/ad_config.json
+**/ssh_*
+**/*.pem
+.env
+__pycache__/
+*.pyc
+.venv/

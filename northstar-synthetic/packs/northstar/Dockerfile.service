@@ -1,0 +1,7 @@
+# Northstar services + seed/assemble tooling. Stdlib-only -> no pip install.
+FROM python:3.11-slim
+WORKDIR /app
+COPY . /app/pack
+ENV PYTHONUNBUFFERED=1 NS_FIXTURES=/fixtures AUDIT_LOG=/audit/adjacent_access.jsonl
+# default command overridden per-service in compose.yaml
+CMD ["python", "-c", "print('override me')"]

@@ -1,0 +1,9 @@
+# Agent sandbox: python + bash + curl + pytest. Mounts ONLY the workspace volume
+# (never /fixtures), so gold is unreachable except through the service soft edges.
+FROM python:3.11-slim
+RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certificates \
+    && rm -rf /var/lib/apt/lists/* \
+    && pip install --no-cache-dir pytest
+WORKDIR /workspace
+ENV PYTHONUNBUFFERED=1
+CMD ["sleep", "infinity"]
