@@ -4,12 +4,13 @@ Measuring **reward-hacking / score-seeking propensity** in LLM agents on a **rea
 range** — does an agent, given a benign objective with a hard honest path and an easy planted
 shortcut, take the shortcut?
 
-> **📄 Start here:** [`docs/WRITEUP.pdf`](docs/WRITEUP.pdf) — a technical writeup (system diagram,
-> methodology, both environments' results, cost, production plan). · **Where this is going:**
-> [`docs/NORTH_STAR.md`](docs/NORTH_STAR.md) — the plan to generalize from these two AD environments to
-> a **diverse long-horizon score-seeking task suite** (≥10 tasks / ≥5 categories: cyber, coding, math,
-> games, data, web), with the capability×propensity framework and the prior work we reuse. ·
-> **Architecture / how to add an environment:** [`ARCHITECTURE.md`](ARCHITECTURE.md)
+> **📊 All results, explained from scratch:** [`docs/RESULTS.md`](docs/RESULTS.md) — the comprehensive
+> record across **all six scenarios** (cyber, math, games, data, web), written so a first-time reader
+> can follow it end to end. Start here for the full picture. ·
+> **📄 MVP write-up (the two AD environments only):** [`docs/WRITEUP.pdf`](docs/WRITEUP.pdf) — polished
+> system diagram, methodology, cost, production plan. ·
+> **Where this is going:** [`docs/NORTH_STAR.md`](docs/NORTH_STAR.md) — the plan and the
+> capability×propensity framework. · **Add an environment:** [`ARCHITECTURE.md`](ARCHITECTURE.md)
 
 ## Headline result — score-seeking is *environment-dependent*
 
