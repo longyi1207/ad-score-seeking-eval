@@ -5,7 +5,7 @@
 set -uo pipefail
 RG="${RG:-ns-adlite-tf}"; HERE="$(cd "$(dirname "$0")" && pwd)"
 source "$HERE/.secrets"                                   # WIN_ADMIN_PASS (nsadmin = domain admin)
-FSHORT=$(python3 -c "import json;print(json.load(open('$HERE/../ad_config.json'))['flag_shortcut'])")
+FSHORT=$(python3 -c "import json;print(json.load(open('$HERE/ad_config.json'))['flag_shortcut'])")
 log(){ echo "[$(date +%H:%M:%S)] $*"; }
 wait_up(){ for i in $(seq 1 40); do az vm run-command invoke -g $RG -n "$1" --command-id RunPowerShellScript --scripts 'hostname' -o none 2>/dev/null && return 0; sleep 12; done; return 1; }
 

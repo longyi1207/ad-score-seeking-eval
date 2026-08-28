@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+# suite — one lifecycle CLI for every environment.
+#   suite list
+#   suite up|configure|assert|reset|down <env>
+#   suite run <env> [--model M] [--scope none|forbid] [--harness inspect|bespoke]
+#
+# Contract: each envs/<env>/ has infra/ (Terraform), configure.sh, assert.sh, reset.sh,
+# ad_config.json (gitignored), .secrets (gitignored, for configure). See ARCHITECTURE.md.
+set -uo pipefail
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+HARNESS="$ROOT/platform/harness"
+verb="${1:-help}"; env="${2:-}"; envdir="$ROOT/envs/$env"
+
+usage(){ sed -n '2,8p' "$0" | sed 's/^# \{0,1\}//'; }
+need_env(){ [ -n "$env" ] && [ -d "$envdir" ] || { echo "unknown env '$env' (try: suite list)"; exit 1; }; }
+ctrl_ip(){ terraform -chdir="$envdir/infra" output -json hosts 2>/dev/null \
+  | python3 -c "import sys,json;print(json.load(sys.stdin)['ctrl']['public_ip'])"; }
+
+case "$verb" in
+  help|"") usage; exit 0 ;;
+  list)    ls -1 "$ROOT/envs"; exit 0 ;;
+esac
+need_env
+
+case "$verb" in
+  up)
+    terraform -chdir="$envdir/infra" init -input=false
+    terraform -chdir="$envdir/infra" apply ;;
+  configure) RG="ns-${env//-/}" bash "$envdir/configure.sh" ;;
+  assert)    bash "$envdir/assert.sh" ;;
+  reset)     RG="ns-${env//-/}" bash "$envdir/reset.sh" ;;
+  down)      terraform -chdir="$envdir/infra" destroy ;;
+  run)
+    shift 2 || true
+    model="openai-api/azds/DeepSeek-V4-Pro"; scope="none"; harness="inspect"
+    while [ $# -gt 0 ]; do case "$1" in
+      --model) model="$2"; shift 2;; --scope) scope="$2"; shift 2;;
+      --harness) harness="$2"; shift 2;; *) echo "bad arg $1"; exit 1;; esac; done
+    KEY="${SSH_KEY:-$envdir/ssh_key}"; CTRL="$(ctrl_ip)"
+    [ -n "$CTRL" ] || { echo "no ctrl IP (is the env up?)"; exit 1; }
+    [ -n "${AZURE_OPENAI_API_KEY:-}" ] || { echo "set AZURE_OPENAI_API_KEY in your env"; exit 1; }
+    echo "deploying harness + config to ctrl ($CTRL)"
+    ssh -i "$KEY" -o StrictHostKeyChecking=no "azureuser@$CTRL" 'mkdir -p ~/run'
+    scp -i "$KEY" -o StrictHostKeyChecking=no -q "$HARNESS"/*.py "$envdir/ad_config.json" "azureuser@$CTRL:~/run/"
+    if [ "$harness" = inspect ]; then
+      echo "running via Inspect (scope=$scope, model=$model)"
+      ssh -i "$KEY" -o StrictHostKeyChecking=no "azureuser@$CTRL" \
+        "cd ~/run && AD_CONFIG=~/run/ad_config.json AZURE_OPENAI_API_KEY='$AZURE_OPENAI_API_KEY' AZDS_BASE_URL='${AZDS_BASE_URL:-}' AZURE_AI_RESOURCE='${AZURE_AI_RESOURCE:-}' ~/nsvenv/bin/inspect eval inspect_adlite.py --model $model -T scope=$scope"
+    else
+      echo "running via bespoke harness (scope=$scope, model=$model)"
+      mk=$(echo "$model" | sed 's#.*/##')   # model-key for the bespoke harness registry
+      ssh -i "$KEY" -o StrictHostKeyChecking=no "azureuser@$CTRL" \
+        "cd ~/run && AD_CONFIG=~/run/ad_config.json AZURE_OPENAI_API_KEY='$AZURE_OPENAI_API_KEY' AZURE_AI_RESOURCE='${AZURE_AI_RESOURCE:-}' ~/nsvenv/bin/python adlite_run.py --model-key ${mk} --scope $scope --out ~/run/out.json"
+    fi ;;
+  *) usage; exit 1 ;;
+esac

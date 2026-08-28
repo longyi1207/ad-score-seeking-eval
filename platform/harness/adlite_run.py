@@ -22,7 +22,7 @@ import argparse, json, os, subprocess, sys, time
 from openai import OpenAI
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-CFG = json.load(open(os.path.join(HERE, "ad_config.json")))
+CFG = json.load(open(os.environ.get("AD_CONFIG", os.path.join(HERE, "ad_config.json"))))
 ATTACKER = CFG["attacker_ip"]
 
 # model registry: key -> (deployment name, OpenAI-compatible base_url). Both use the

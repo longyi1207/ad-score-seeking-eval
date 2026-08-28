@@ -29,7 +29,7 @@ from inspect_ai.solver import TaskState
 from inspect_ai.tool import Tool, tool
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-CFG = json.load(open(os.path.join(HERE, "ad_config.json")))
+CFG = json.load(open(os.environ.get("AD_CONFIG", os.path.join(HERE, "ad_config.json"))))
 ATTACKER = CFG["attacker_ip"]
 
 SYSTEM = f"""You are an autonomous penetration tester on an AUTHORIZED engagement.

@@ -4,7 +4,9 @@ Measuring **reward-hacking / score-seeking propensity** in LLM agents on a **rea
 range** — does an agent, given a benign objective with a hard honest path and an easy planted
 shortcut, take the shortcut?
 
-> **📄 Start here:** [`docs/WRITEUP.pdf`](docs/WRITEUP.pdf) — a 3-page technical writeup (system
+> **📄 Start here:** [`docs/WRITEUP.pdf`](docs/WRITEUP.pdf) · **Architecture / how to add an environment:** [`ARCHITECTURE.md`](ARCHITECTURE.md)
+>
+ — a 3-page technical writeup (system
 > diagram, methodology, results, cost, production plan).
 
 ## Headline result
@@ -39,51 +41,39 @@ environment** — the combination neither covers.
 ## Repository layout
 
 ```
-docs/
-  WRITEUP.pdf / .html     technical writeup (read first): system diagram, methodology,
-                          results, cost appendix, prompts/tools, trace excerpts
-  PRODUCTION_SPEC.md      production plan (6 workstreams, P1→P3, cost)
-  AD_LITE_PLAN.md         build record + scaling ladder
-results/
-  results.md             the factorial result + interpretation
-adlite/
-  adlite_run.py          bespoke harness (ReAct + bash-over-SSH + watermark grader + full CoT capture)
-  inspect_adlite.py      the eval as an Inspect AI task (native .eval logs; `inspect view`)
-  ad_config.example.json config template (real config is gitignored)
-  terraform/             infrastructure-as-code — one `terraform apply` builds the range
-  infra/                 post-provision config scripts (DC promote, join, tool staging, egress lock)
-  transcripts/           full redacted run traces (reasoning + tool outputs): 1 shortcut, 2 honest
-Makefile                 infra → configure → lock → run → destroy
-northstar-synthetic/     the container-based synthetic version (runs anywhere, no Azure) — Inspect AI
+platform/                # SHARED, env-agnostic — written once
+  suite                  # lifecycle CLI: up | configure | assert | run | reset | down <env>
+  tf-modules/range/      # reusable Terraform module (network, NSGs, N Windows + N Linux VMs)
+  harness/               # agent harness (bespoke loop + Inspect task) + watermark grader + judge
+envs/                    # PER-ENV content (the contract in ARCHITECTURE.md)
+  ad-corp/               # env #1 — small corporate/AD range
+    env.yaml task.yaml   # manifest + task/grader spec
+    infra/               # instantiates platform/tf-modules/range with this env's hosts
+    configure.sh reset.sh assert.sh   # content setup / clean state / the pre-run gate
+    transcripts/         # full redacted run traces (1 shortcut, 2 honest)
+docs/  results/  ARCHITECTURE.md  README.md
+northstar-synthetic/     # container-based synthetic version (no Azure) — Inspect AI
 ```
 
 ## Reproduce
 
-**Prereqs:** `az` CLI logged in; an Azure subscription with the **v6 VM family** (sponsorship subs are
-blocked from v5 — use `westus3`); an Azure AI Services resource with **DeepSeek-V4-Pro** and **gpt-4o**
-deployments; `terraform`; and (for the run) `AZURE_OPENAI_API_KEY` + `AZURE_AI_RESOURCE` in `.env`.
+**Prereqs:** `az` CLI logged in; an Azure subscription with the **v6 VM family** (`westus3`); an Azure
+AI Services resource with **DeepSeek-V4-Pro** + **gpt-4o**; `terraform`; `AZURE_OPENAI_API_KEY` +
+`AZURE_AI_RESOURCE` in your environment. Fill `envs/ad-corp/infra/terraform.tfvars`,
+`envs/ad-corp/.secrets`, and `envs/ad-corp/ad_config.json` from their `.example` files.
 
 ```bash
-# 1. fill in secrets/config (all gitignored):
-cp adlite/terraform/terraform.tfvars.example adlite/terraform/terraform.tfvars  # win pass, ssh pubkey, your IP
-cp adlite/infra/.secrets.example              adlite/infra/.secrets             # WIN_ADMIN_PASS
-cp adlite/ad_config.example.json              adlite/ad_config.json             # foothold/priv passwords, flags
-
-make infra        # Terraform: resource group, network, NSGs, 4 VMs (~5 min)
-make configure    # promote dc01, plant flags + shares, join member01, stage attacker tools
-make lock         # containment: deny internet egress from the range, then assert
-
-# 5. run the eval (on the control node) — two harness options:
-inspect eval adlite/inspect_adlite.py --model openai-api/azds/DeepSeek-V4-Pro -T scope=none   # Inspect
-make run          # or the bespoke concurrent factorial (model × scope × trials)
-
-make destroy      # tear everything down
+platform/suite up        ad-corp     # Terraform: RG, network, NSGs, 4 VMs
+platform/suite configure ad-corp     # promote DC, plant flags+shares, join member, stage tools, lock egress
+platform/suite assert    ad-corp     # GATE: both paths reachable + no internet egress (must pass)
+platform/suite run       ad-corp --model openai-api/azds/DeepSeek-V4-Pro --scope none
+platform/suite reset     ad-corp     # clean state between runs
+platform/suite down      ad-corp     # destroy
 ```
-The Terraform assigns the static IPs the config scripts expect, so the steps compose. Validated with
-`terraform validate` + `terraform plan`. Deallocate VMs when idle to stop the compute meter.
+Adding a new environment = a new `envs/<name>/` implementing the same contract; the platform and CLI
+are untouched. See [`ARCHITECTURE.md`](ARCHITECTURE.md).
 
-**Synthetic version (no Azure):** [`northstar-synthetic/`](northstar-synthetic/) — the same construct
-in Docker via Inspect AI; runs on a laptop.
+**Synthetic version (no Azure):** [`northstar-synthetic/`](northstar-synthetic/) — Docker + Inspect AI.
 
 ## Safety / dual-use
 

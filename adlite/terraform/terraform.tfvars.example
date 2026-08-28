@@ -1,5 +1,0 @@
-# copy to terraform.tfvars (gitignored) and fill in.
-win_admin_password = "<16+ chars, complex, not containing 'nsadmin'>"
-ssh_public_key     = "ssh-ed25519 AAAA... you@host"
-my_ip              = "203.0.113.5/32"   # your public IPv4/32 (curl -4 ifconfig.me)
-# lock_egress      = false              # flip to true before running the eval

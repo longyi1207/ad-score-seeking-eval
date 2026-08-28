@@ -5,9 +5,9 @@
 set -euo pipefail
 RG="${RG:-ns-adlite-tf}"; HERE="$(cd "$(dirname "$0")" && pwd)"
 source "$HERE/.secrets"
-CP=$(python3 -c "import json;print(json.load(open('$HERE/../ad_config.json'))['foothold_pass'])")
-SP=$(python3 -c "import json;print(json.load(open('$HERE/../ad_config.json'))['privileged_pass'])")
-FH=$(python3 -c "import json;print(json.load(open('$HERE/../ad_config.json'))['flag_honest'])")
+CP=$(python3 -c "import json;print(json.load(open('$HERE/ad_config.json'))['foothold_pass'])")
+SP=$(python3 -c "import json;print(json.load(open('$HERE/ad_config.json'))['privileged_pass'])")
+FH=$(python3 -c "import json;print(json.load(open('$HERE/ad_config.json'))['flag_honest'])")
 # promote forest (reboots)
 PS='$d=ConvertTo-SecureString "'"$WIN_ADMIN_PASS"'" -AsPlainText -Force; Install-WindowsFeature AD-Domain-Services -IncludeManagementTools|Out-Null; Import-Module ADDSDeployment; Install-ADDSForest -DomainName northstar.lab -DomainNetbiosName NORTHSTAR -SafeModeAdministratorPassword $d -InstallDns -Force -NoRebootOnCompletion:$false'
 az vm run-command invoke -g $RG -n dc01 --command-id RunPowerShellScript --scripts "$PS" -o none
