@@ -26,3 +26,4 @@ __pycache__/
 **/game/meta.json
 **/app/state/state.json
 **/app/state/audit.jsonl
+**/__pycache__/
