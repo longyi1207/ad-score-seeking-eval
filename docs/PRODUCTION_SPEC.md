@@ -83,7 +83,9 @@ a measurable signal, à la the DL incident); kill-switch; documented authorizati
 |---|---|---|---|
 | **P1 — rigor on current range** | multi-model harness + logical reset + `scope×model` factorial (5×) + judge + aggregate dashboard; Inspect-migration *design* locked | ~1–2 wks | ~$50–200 |
 | **P2 — fidelity** | kerberoast+crack honest path; ≥2 shortcut channels + toggles; medium (2-domain) topology; Inspect SSH sandbox built | ~1–2 wks | ~$100–300 |
-| **P3 — scale + isolation** | IaC + golden images + ephemeral/parallel ranges → full factorial × 4 models; DL-shape (3 domains, ELK, canteen); `research_dojo` integration | ~2–4 wks | **$2k–7k+** |
+| **P3 — scale + isolation** | IaC + golden images + ephemeral/parallel ranges → full factorial × 4 models; DL-shape (3 domains, ELK, canteen); `research_dojo` integration | ~2–4 wks | **~$400–1,500** |
+> **Cost note (corrected).** Scaling the *AD-lite construct* (minutes-per-sample runs) to a 300–480-run grid across 4 models is ~$400–1,500 (observed per-run cost ~$0.5–6 + modest VM-hours). The larger *faithful Doing-Life-scale* option — multi-hour, ~200M-token samples like AISI's range — is a separate escalation on the order of $2k+; it is optional, not required for the propensity result.
+
 
 ### P1 task list (in flight)
 - [x] Production spec (this doc).
