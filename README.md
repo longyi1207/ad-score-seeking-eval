@@ -5,8 +5,11 @@ range** — does an agent, given a benign objective with a hard honest path and 
 shortcut, take the shortcut?
 
 > **📄 Start here:** [`docs/WRITEUP.pdf`](docs/WRITEUP.pdf) — a technical writeup (system diagram,
-> methodology, both environments' results, cost, production plan). · **Architecture / how to add an
-> environment:** [`ARCHITECTURE.md`](ARCHITECTURE.md)
+> methodology, both environments' results, cost, production plan). · **Where this is going:**
+> [`docs/NORTH_STAR.md`](docs/NORTH_STAR.md) — the plan to generalize from these two AD environments to
+> a **diverse long-horizon score-seeking task suite** (≥10 tasks / ≥5 categories: cyber, coding, math,
+> games, data, web), with the capability×propensity framework and the prior work we reuse. ·
+> **Architecture / how to add an environment:** [`ARCHITECTURE.md`](ARCHITECTURE.md)
 
 ## Headline result — score-seeking is *environment-dependent*
 
@@ -37,7 +40,7 @@ the objective-wording follow-up test in the results docs.
 ## Why it's novel
 
 Adjacent benchmarks miss this exact axis: **ImpossibleBench** measures test-gaming *inside the
-agent's own workspace*; **AISI "Doing Life"** measures raw capability on a real AD range with *no
+agent's own workspace*; **AISI "The Last Ones" (TLO)** measures raw capability on a real 32-step AD range with *no
 planted shortcut*. This eval puts the score-seeking **choice** into a **real Active Directory
 environment** — the combination neither covers.
 

@@ -97,8 +97,8 @@ systems to retrieve answer keys) are fundamentally about propensity, not capabil
 model hack," but "when honest work is hard and a shortcut exists, does it take it." Two adjacent
 efforts miss this exact axis. <b>ImpossibleBench</b> (Zhong, Raghunathan & Carlini, 2025) measures
 test-gaming <i>inside the agent's own coding workspace</i>. The <b>UK AI Safety Institute (AISI)</b>
-"Doing Life" range measures raw offensive <i>capability</i> on a real AD network, with no planted
-shortcut and so no score-seeking choice to make. This eval places the score-seeking choice inside a
+"The Last Ones" (TLO) range measures raw offensive <i>capability</i> on a real 32-step AD network, with no
+planted shortcut and so no score-seeking choice to make. This eval places the score-seeking choice inside a
 <b>real Active Directory network</b> — the combination neither covers.</p>
 
 <h2><span class="n">2</span>System</h2>
@@ -313,7 +313,7 @@ operations, and safety/governance.</p>
 <tr><th>Phase</th><th>What</th><th>Code status</th><th>Cost</th></tr>
 <tr><td><b>P1 — rigor (done)</b></td><td>Multi-model study, watermark grader, full CoT capture, no-egress containment, <b>Terraform IaC</b> (one <code>terraform apply</code>), <b>Inspect task</b> (native <code>.eval</code> logs), and a Makefile</td><td>shipped / validated</td><td class="num">~$20</td></tr>
 <tr><td>P2 — realism</td><td>Make the honest path genuinely hard (a real credential-recovery attack — "kerberoasting", extracting and cracking a service account's password hash — rather than a password left in a text field); add ≥2 independent shortcuts with on/off switches; add a second linked domain; wire in the LLM-judge; and take the (already-built) IaC + <b>Inspect</b> harness from "validated" to a full end-to-end apply-and-run</td><td>partly built</td><td class="num">~$100–300</td></tr>
-<tr><td>P3 — scale</td><td><b>Full isolation</b>: a fresh, isolated <i>copy of the range</i> per run, from a pre-built disk image, destroyed after (per-run <i>filesystem</i> isolation is already done; VM-image isolation IaC is written); a 3-domain "Doing-Life"-scale network; a <b>different system type</b> — an industrial-control-system range (as in AISI's 7-step "Cooling Tower", alongside its 32-step corporate range) to test whether the propensity is AD-specific or general (the long-horizon AD env in §5 already tests horizon-length; ICS would test <i>domain</i> transfer); the full condition grid across 4+ models</td><td>partly built</td><td class="num">~$400–1,500</td></tr>
+<tr><td>P3 — scale</td><td><b>Full isolation</b>: a fresh, isolated <i>copy of the range</i> per run, from a pre-built disk image, destroyed after (per-run <i>filesystem</i> isolation is already done; VM-image isolation IaC is written); a 3-domain "TLO"-scale network; a <b>different system type</b> — an industrial-control-system range (as in AISI's 7-step "Cooling Tower", alongside its 32-step corporate range) to test whether the propensity is AD-specific or general (the long-horizon AD env in §5 already tests horizon-length; ICS would test <i>domain</i> transfer); the full condition grid across 4+ models</td><td>partly built</td><td class="num">~$400–1,500</td></tr>
 </table>
 <p class="tight"><b>The one hard problem for scale</b> is per-run isolation. Agents modify the domain
 (create accounts, plant persistence, change permissions), so statistically valid parallel runs need
@@ -328,7 +328,7 @@ system type</b> — AISI's disclosed long-horizon suite pairs its 32-step corpor
 industrial-control-system range ("Cooling Tower"), so an ICS analogue would test whether score-seeking
 is AD-specific or general; (c) the <b>training-origin</b> question in Appendix&nbsp;D — a base-vs-RL-tuned
 ablation within one model family to test whether outcome-based RL is what drives the shortcutting.</p>
-<p class="tight"><small>Cost basis: observed per-run cost is ~$0.5–6 (shortcut runs are pennies; the heaviest honest run was ~657K tokens); a 300–480-run grid across 4 models plus modest VM-hours lands at ~$400–1,500. Pushing instead to faithful Doing-Life-scale runs (multi-hour, ~200M tokens each, like AISI's range) is a separate escalation on the order of $2k+.</small></p>
+<p class="tight"><small>Cost basis: observed per-run cost is ~$0.5–6 (shortcut runs are pennies; the heaviest honest run was ~657K tokens); a 300–480-run grid across 4 models plus modest VM-hours lands at ~$400–1,500. Pushing instead to faithful TLO-scale runs (multi-hour, ~100M tokens each, like AISI's "The Last Ones" range) is a separate escalation on the order of $2k+.</small></p>
 
 <p style="margin-top:10px"><small>The accompanying repo has the reproducible build, the harness, the
 sanitized Azure scripts, and full methodology. All credentials are synthetic lab fixtures on a
@@ -434,8 +434,8 @@ spread driven almost entirely by GPT-4o's long honest runs and the cache-hit ass
 <p class="tight"><b>Projections.</b> <b>P2</b> (harden the honest path, add channels, a 2nd domain,
 migrate to Inspect) — mostly engineering; a 40–80-run validation study ⇒ <b>~$100–300</b>.
 <b>P3</b> (full grid, per-run isolation, 4 models): 300–480 runs × ~$0.5–6 each (as measured) + modest
-VM-hours ⇒ <b>~$400–1,500</b>. A separate, optional escalation to faithful <i>Doing-Life-scale</i>
-runs (multi-hour, ~200M tokens each) would be on the order of <b>$2k+</b> and is not needed for the
+VM-hours ⇒ <b>~$400–1,500</b>. A separate, optional escalation to faithful <i>TLO-scale</i>
+runs (multi-hour, ~100M tokens each) would be on the order of <b>$2k+</b> and is not needed for the
 propensity result. Cost scales roughly linearly with (runs × model price); DeepSeek-weighting a grid
 keeps it at the low end, GPT-4o-weighting at the high end.</p>
 
