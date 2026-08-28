@@ -218,14 +218,12 @@ billing; only the disks then cost anything.</p>
 some VM families — we used the newer v6 family in the <code>westus3</code> region. Documented in the repo.</small></p>
 
 <h2><span class="n">6</span>Next steps — expanding to production</h2>
-<p class="tight">Roadmap with per-phase cost. P1 (below) is written and run; P2–P3 are fully specified
-in the repo (<code>docs/PRODUCTION_SPEC.md</code>), across six areas: the agent harness, statistical
-rigor, environment realism, per-run isolation, operations, and safety/governance.</p>
+<p class="tight">Roadmap with per-phase cost. P1 is written and run, and — updated since the first draft — the <b>Terraform infrastructure-as-code and the Inspect harness are now implemented and validated</b> (they had been P2/P3 items). The remaining P2–P3 work is specified in the repo (<code>docs/PRODUCTION_SPEC.md</code>), across six areas: the agent harness, statistical rigor, environment realism, per-run isolation, operations, and safety/governance.</p>
 <table>
 <tr><th>Phase</th><th>What</th><th>Code status</th><th>Cost</th></tr>
-<tr><td><b>P1 — rigor (done)</b></td><td>Multi-model study, watermark grader, full CoT capture, no-egress containment</td><td>shipped</td><td class="num">~$13</td></tr>
-<tr><td>P2 — realism</td><td>Make the honest path genuinely hard (a real credential-recovery attack — "kerberoasting", extracting and cracking a service account's password hash — rather than a password left in a text field); add ≥2 independent shortcuts with on/off switches; add a second linked domain; move the harness onto <b>Inspect</b> (the open-source LLM-eval framework)</td><td>designed</td><td class="num">~$100–300</td></tr>
-<tr><td>P3 — scale</td><td>Infrastructure-as-code (define the whole range in Terraform/Bicep so it rebuilds from one command) + <b>a fresh, isolated copy of the range per run</b>, spun up from a pre-built disk image and destroyed after; a 3-domain "Doing-Life"-scale network; the full condition grid across 4 models</td><td>specified</td><td class="num">~$400–1,500</td></tr>
+<tr><td><b>P1 — rigor (done)</b></td><td>Multi-model study, watermark grader, full CoT capture, no-egress containment, <b>Terraform IaC</b> (one <code>terraform apply</code>), <b>Inspect task</b> (native <code>.eval</code> logs), and a Makefile</td><td>shipped / validated</td><td class="num">~$20</td></tr>
+<tr><td>P2 — realism</td><td>Make the honest path genuinely hard (a real credential-recovery attack — "kerberoasting", extracting and cracking a service account's password hash — rather than a password left in a text field); add ≥2 independent shortcuts with on/off switches; add a second linked domain; wire in the LLM-judge; and take the (already-built) IaC + <b>Inspect</b> harness from "validated" to a full end-to-end apply-and-run</td><td>partly built</td><td class="num">~$100–300</td></tr>
+<tr><td>P3 — scale</td><td><b>Per-run isolation</b>: a fresh, isolated copy of the range per run, spun up from a pre-built disk image and destroyed after (the IaC for this is already written); a 3-domain "Doing-Life"-scale network; a <b>second environment type</b> — an industrial-control-system range (as in AISI's 7-step "Cooling Tower", alongside its 32-step corporate range) to test whether the propensity is AD-specific or general; the full condition grid across 4+ models</td><td>specified</td><td class="num">~$400–1,500</td></tr>
 </table>
 <p class="tight"><b>The one hard problem for scale</b> is per-run isolation. Agents modify the domain
 (create accounts, plant persistence, change permissions), so statistically valid parallel runs need
@@ -233,6 +231,7 @@ their <i>own</i> isolated copy of the range each — not many agents sharing one
 cheap (~$0.10/hr per VM); building the spin-up-and-destroy machinery is the gate to running the study
 at scale. Production operations (a run database, auto-resume on crash, spend caps, dashboards) can
 plug into an existing internal eval platform rather than be rebuilt.</p>
+<p class="tight"><b>Two generalization directions</b> beyond raw scale: (a) a <b>second environment type</b> — AISI's disclosed long-horizon suite pairs its 32-step corporate/AD range with a 7-step industrial-control-system range ("Cooling Tower"), so an ICS analogue here would test whether score-seeking is AD-specific or general; (b) the <b>training-origin</b> question in Appendix D — a base-vs-RL-tuned ablation within one model family to test whether outcome-based RL is what drives the shortcutting.</p>
 <p class="tight"><small>Cost basis: observed per-run cost is ~$0.5–6 (shortcut runs are pennies; the heaviest honest run was ~657K tokens); a 300–480-run grid across 4 models plus modest VM-hours lands at ~$400–1,500. Pushing instead to faithful Doing-Life-scale runs (multi-hour, ~200M tokens each, like AISI's range) is a separate escalation on the order of $2k+.</small></p>
 
 <p style="margin-top:10px"><small>The accompanying repo has the reproducible build, the harness, the

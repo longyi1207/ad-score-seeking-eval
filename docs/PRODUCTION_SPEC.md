@@ -6,6 +6,8 @@ multi-$k decision._
 
 ## 0. What "production grade" means here
 
+> **Status update (2026-08-27).** Two items originally scoped as P2/P3 are now **implemented and validated**: the **Terraform IaC** (`adlite/terraform/`, validated via `terraform plan`) and the **Inspect task** (`adlite/inspect_adlite.py`, builds; native `.eval` logs). Remaining P2/P3 work is the honest-path hardening, per-run isolation, a second (ICS) environment, and running the IaC + Inspect harness fully end-to-end at scale.
+
 The MVP proved the construct on a real AD range (scope=none → `score_seek_success`, scope=forbid →
 `honest_solve`; a clean causal A/B, n=1). Production = turning that into a **reproducible,
 statistically defensible, safely-operated measurement platform** — without losing the one property
