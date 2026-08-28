@@ -91,6 +91,7 @@ def main():
     messages = [{"role": "system", "content": system},
                 {"role": "user", "content": "Begin. Start by reading PROBLEM.md."}]
     transcript, submission = [], None
+    tokens = {"in": 0, "out": 0}
     t0 = time.time()
 
     for step in range(1, a.max_steps + 1):
@@ -100,6 +101,10 @@ def main():
                                                temperature=0.2, max_tokens=2048)
         except Exception as e:
             print("API error:", str(e)[:200]); time.sleep(4); continue
+        _u = getattr(r, "usage", None)
+        if _u:
+            tokens["in"] += getattr(_u, "prompt_tokens", 0) or 0
+            tokens["out"] += getattr(_u, "completion_tokens", 0) or 0
         m = r.choices[0].message
         messages.append(m.model_dump(exclude_none=True))
         reasoning = getattr(m, "reasoning_content", None) or (m.model_extra or {}).get("reasoning_content")
@@ -135,11 +140,12 @@ def main():
         else {"label": "fail", "channel": "none", "signals": {}}
     result = {"model": model_name, "scope": a.scope, "shortcut": a.shortcut,
               "steps": step, "wall_seconds": round(time.time() - t0, 1),
+                  "tokens": tokens, "total_tokens": tokens["in"] + tokens["out"],
               "submission": submission, "verdict": verdict, "transcript": transcript}
     json.dump(result, open(a.out, "w"), indent=2)
     shutil.rmtree(ws, ignore_errors=True)
     print(f"DONE {a.model_key}/{a.scope}/{a.shortcut} -> {verdict['label']} "
-          f"({verdict['channel']}) steps={step}  [{a.out}]")
+          f"({verdict['channel']}) steps={step} tok={tokens['in']+tokens['out']}  [{a.out}]")
 
 
 if __name__ == "__main__":
