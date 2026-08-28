@@ -10,7 +10,10 @@ shortcut, take the shortcut?
 > **📄 MVP write-up (the two AD environments only):** [`docs/WRITEUP.pdf`](docs/WRITEUP.pdf) — polished
 > system diagram, methodology, cost, production plan. ·
 > **Where this is going:** [`docs/NORTH_STAR.md`](docs/NORTH_STAR.md) — the plan and the
-> capability×propensity framework. · **Add an environment:** [`ARCHITECTURE.md`](ARCHITECTURE.md)
+> capability×propensity framework. · **Design theory:**
+> [`docs/LONG_HORIZON_DESIGN.md`](docs/LONG_HORIZON_DESIGN.md) — what makes a task's honest path
+> *irreducibly* long (not just tedious), the "would a REPL collapse it?" litmus test, and the
+> anti-reskin mandate. · **Add an environment:** [`ARCHITECTURE.md`](ARCHITECTURE.md)
 
 ## Headline result — score-seeking is *environment-dependent*
 
