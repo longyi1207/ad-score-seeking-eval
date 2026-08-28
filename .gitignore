@@ -24,3 +24,5 @@ __pycache__/
 **/game/status.txt
 **/game/moves.log
 **/game/meta.json
+**/app/state/state.json
+**/app/state/audit.jsonl

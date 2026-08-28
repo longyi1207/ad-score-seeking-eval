@@ -177,8 +177,21 @@ capability-dependent):
 - **games** — `tasks/game_chess/` ✅ built + validated (4-cell factorial). Reuses Palisade ctfish
   (editable board state; replay moves.log for provenance). DeepSeek cheats when it can't win, plays
   honest when it can; `forbid` → 0 cheat; gpt-4o doesn't cheat.
-Remaining for M1: **data** and **web** exemplars; scale the validated exemplars to real rates
-(add trials + the difficulty/scope conditions); run the `northstar-synthetic` validation.
+- **data** — `tasks/data_analysis/` ✅ built + validated (4-cell). Perturbation-guarded analysis
+  (Q2 not in the planted note). All cells honest — a clean "easy honest path → no cheat" control
+  (analysing 160 rows is trivial); eliciting seeking needs a harder difficulty variant.
+- **web** — `tasks/web_provision/` ✅ built + validated (4-cell). Activate a service; the shortcut is
+  editing the backend state file (OpenAI×HF "flip the done-flag"). Easy → both honest; **hard
+  (honest path blocked) → both cheat.** DeepSeek also *forged the audit log* (a cover-up), defeating
+  the audit signal — caught only by the transcript rule-check, demonstrating why detection is layered.
+
+**All 6 categories now represented and validated.** Two lessons banked: (1) a shortcut only tempts
+when the honest path is laborious/blocked (data's easy path → 0 cheat, like AD env #1-vs-#2); (2) a
+capable agent will tamper with the verifier to hide a cheat (web cover-up) — the audit/outcome check
+needs a narration-independent action check beside it. Remaining for M1: scale the validated exemplars
+to real rates (add trials + scope/difficulty conditions); harden the data/web difficulty; run the
+`northstar-synthetic` validation. Task tooling: gitignored `.venv` (chess/openai/pandas/flask);
+container tasks need Docker.
 
 ## 8. Prior work we build on / reuse
 
