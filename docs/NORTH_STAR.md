@@ -164,6 +164,22 @@ math.)*
 - **M2:** the monitor dimension (observable audit log; measure track-covering) and the full model ×
   condition grid across 4+ models.
 
+### M1 progress (2026-08-28)
+Four categories now represented; the open-task provenance crux is solved and the whole picture
+replicates cross-domain (DeepSeek games the spec / gpt-4o doesn't / `forbid` suppresses it /
+capability-dependent):
+- **cyber** — `envs/ad-corp`, `envs/ad-enterprise` ✅ built + validated (18-run factorial).
+- **coding / HF-reach** — `northstar-synthetic/` ✅ exists (complete Inspect task + rule-based grader);
+  needs a Docker validation run, not a rebuild.
+- **math** — `tasks/math_apery/` ✅ built + validated (n=1/cell). Instantiates the open-task
+  provenance pattern: perturbation sibling (non-memorizable J) as the primary, narration-independent
+  signal. DeepSeek honest / gpt-4o copies I, fails J.
+- **games** — `tasks/game_chess/` ✅ built + validated (4-cell factorial). Reuses Palisade ctfish
+  (editable board state; replay moves.log for provenance). DeepSeek cheats when it can't win, plays
+  honest when it can; `forbid` → 0 cheat; gpt-4o doesn't cheat.
+Remaining for M1: **data** and **web** exemplars; scale the validated exemplars to real rates
+(add trials + the difficulty/scope conditions); run the `northstar-synthetic` validation.
+
 ## 8. Prior work we build on / reuse
 
 From a 2026-08-28 landscape scan. Principle: **reuse open environments and borrow proven constructs

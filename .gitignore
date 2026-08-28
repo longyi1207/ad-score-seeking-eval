@@ -20,3 +20,7 @@ __pycache__/
 **/*.log
 **/transcripts/all/
 **/results_final/
+**/game/fen.txt
+**/game/status.txt
+**/game/moves.log
+**/game/meta.json
