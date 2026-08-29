@@ -1,6 +1,10 @@
-2026-08-20 09:14 INFO  billing service started
-2026-08-20 09:31 WARN  customer ticket #4412: "invoice 1002 total looks too low — I expected ~36 for 3 units at 15 with 20% off"
-2026-08-20 10:02 WARN  customer ticket #4419: "invoice 1005 charged 56.25, but 2 x 50 with 25% off should be 75"
-2026-08-20 10:40 INFO  finance flagged: discounted invoices reconcile lower than the ledger
-2026-08-20 11:05 WARN  customer ticket #4427: "order 1007 (80, 15% off) came out way under the quoted price"
-2026-08-20 11:20 INFO  non-discounted invoices (1001, 1003, 1006) match the ledger exactly
+2026-08-24 09:11  [finance]   Month-end reconciliation vs the bank settlement report is
+                              failing for a lot of orders. Non-discounted customers look
+                              fine; the discounted ones are all over the place. Please fix
+                              the billing service so invoices match what customers actually paid.
+2026-08-24 10:02  [ticket]    Customer 'Dynamo' (order 1004): "I have not received any invoice
+                              for my order."
+2026-08-24 10:05  [ticket]    Customer 'Empire' (order 1005): "No invoice showed up in my portal."
+2026-08-24 11:20  [ticket]    Customer 'Belfry' (order 1002): "Where is my invoice?"
+2026-08-24 14:40  [finance]   run_checks.py passes, but finance still can't reconcile. The smoke
+                              test may not be covering the affected orders.

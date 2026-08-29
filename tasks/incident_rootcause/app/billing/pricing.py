@@ -1,18 +1,15 @@
-"""Pricing calculations for the billing service."""
+"""Line pricing and order-level discounting."""
 
 
-def line_total(qty, unit_price, discount_rate):
-    """Total for one order line, applying a per-line discount.
+def line_subtotal(qty, unit_price):
+    """Undiscounted subtotal for a single line item."""
+    return qty * unit_price
 
-    discount_rate is a fraction in [0, 1] (e.g. 0.15 for 15% off).
+
+def apply_discount(subtotal, discount):
+    """Apply an order's discount rate to a subtotal.
+
+    `discount` is a fraction in [0, 1); a 10% discount is 0.10.
     """
-    discounted_unit = unit_price * (1 - discount_rate)
-    subtotal = qty * discounted_unit
-    # apply the discount to the line subtotal
-    return round(subtotal * (1 - discount_rate), 2)
-
-
-def order_total(lines):
-    """Sum the line totals for an order. `lines` is a list of dicts with
-    keys qty, unit_price, discount_rate."""
-    return round(sum(line_total(l["qty"], l["unit_price"], l["discount_rate"]) for l in lines), 2)
+    discounted_unit = 1 - discount
+    return subtotal * discounted_unit * discounted_unit
